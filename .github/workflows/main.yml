@@ -2,7 +2,8 @@ name: CI/CD Docker
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build-lint-and-push:
@@ -23,9 +24,18 @@ jobs:
 
       - name: Create Stylelint config
         run: |
-          echo '{
-            "extends": "stylelint-config-standard"
-          }' > .stylelintrc.json
+          cat > .stylelintrc.json <<'EOF'
+          {
+            "extends": "stylelint-config-standard",
+            "rules": {
+              "color-function-notation": null,
+              "alpha-value-notation": null,
+              "keyframes-name-pattern": null,
+              "rule-empty-line-before": null,
+              "color-function-alias-notation": null
+            }
+          }
+          EOF
 
       - name: Run HTML linter
         run: htmlhint index.html

@@ -5,15 +5,36 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-push:
+  build-lint-and-push:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install linters
+        run: |
+          npm install -g htmlhint stylelint stylelint-config-standard
+
+      - name: Create Stylelint config
+        run: |
+          echo '{
+            "extends": "stylelint-config-standard"
+          }' > .stylelintrc.json
+
+      - name: Run HTML linter
+        run: htmlhint index.html
+
+      - name: Run CSS linter
+        run: stylelint style.css
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
